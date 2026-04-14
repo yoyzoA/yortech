@@ -1,0 +1,15 @@
+{
+  "name": "yortech",
+  "version": "1.0.0",
+  "description": "YorTech — Daily Tech & Science Newspaper by Yorgo Assal",
+  "private": true,
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "cd server && npm install && cd ../client && npm install"
+  },
+  "author": "Yorgo Assal",
+  "license": "MIT"
+}

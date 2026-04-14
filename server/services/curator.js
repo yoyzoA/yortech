@@ -108,7 +108,7 @@ const curateEdition = async (articles, date) => {
   // ── Poll until complete ───────────────────────────────────────────────────
   // Batches typically complete in 1–5 minutes.
   // We poll every 30 seconds with a 15-minute timeout.
-  const MAX_WAIT_MS   = 15 * 60 * 1000;  // 15 minutes
+  const MAX_WAIT_MS   = 60 * 60 * 1000;  // 15 minutes
   const POLL_INTERVAL = 30 * 1000;        // 30 seconds
   const startTime     = Date.now();
 

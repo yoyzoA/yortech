@@ -6,6 +6,7 @@ const path       = require('path');
 
 const editionsRouter = require('./routes/editions');
 const { startScheduler } = require('./services/scheduler');
+const { testConnection } = require('./db/database');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -59,8 +60,12 @@ app.use((err, req, res, next) => {
 });
 
 // ── Start server ──────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[YorTech API] Running on port ${PORT} — ${process.env.NODE_ENV || 'development'} mode`);
+
+  // Verify database connection on startup
+  // If this fails, check your DATABASE_URL in .env
+  await testConnection();
 
   // Start the daily generation + cleanup scheduler
   // Only runs in production to avoid accidental API calls during development
@@ -68,7 +73,7 @@ app.listen(PORT, () => {
     startScheduler();
     console.log('[Scheduler] Daily generation job active');
   } else {
-    console.log('[Scheduler] Skipped in development mode');
+    console.log('[Scheduler] Skipped in development mode — use generateEdition() to test manually');
   }
 });
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yorgo Assal — Portfolio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .name {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #39ff8f;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .title {
+      font-size: 1rem;
+      color: #888;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+    }
+
+    .status {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 2rem;
+      border: 1px solid #222;
+      padding: 0.75rem 1.5rem;
+      display: inline-block;
+    }
+
+    .status span {
+      color: #39ff8f;
+    }
+
+    .link {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      border: 1px solid #39ff8f;
+      color: #39ff8f;
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+    }
+
+    .link:hover {
+      background: #39ff8f;
+      color: #0a0a0f;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.2em;
+      background: #39ff8f;
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="name">YORGO ASSAL<span class="cursor"></span></div>
+    <div class="title">Computer Engineering Student</div>
+    <div class="status">
+      Portfolio — <span>Coming Soon</span>
+    </div>
+    <br />
+    <a class="link" href="/yortech">→ Read YorTech Daily</a>
+  </div>
+</body>
+</html>

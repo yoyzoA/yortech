@@ -1,0 +1,147 @@
+/* ── Tailwind directives ───────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base reset & global styles ────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-terminal text-textPrimary font-mono;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Subtle dot grid background texture */
+    background-image: radial-gradient(circle, #1e1e2e 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Scrollbar styling — keeps the terminal aesthetic in webkit browsers */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-terminal;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-phosphorDim;
+  }
+
+  /* Selection colour */
+  ::selection {
+    background-color: rgba(57, 255, 143, 0.25);
+    color: #e8e8e8;
+  }
+
+  /* Links */
+  a {
+    @apply text-phosphor no-underline;
+    transition: opacity 0.15s ease;
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+
+  /* Headings default to display font */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-textPrimary;
+  }
+}
+
+/* ── Reusable component classes ─────────────────────────────────────────────── */
+@layer components {
+
+  /* ── ASCII divider line ──────────────────────────────────────────────────── */
+  .ascii-divider {
+    @apply w-full text-phosphorDim text-xs overflow-hidden whitespace-nowrap;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+
+  /* ── Category badge ──────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-block px-2 py-0.5 text-xs font-display uppercase tracking-widest;
+    border: 1px solid currentColor;
+  }
+
+  .badge-ai       { @apply text-catAi     border-catAi; }
+  .badge-dev      { @apply text-catDev    border-catDev; }
+  .badge-research { @apply text-catResearch border-catResearch; }
+  .badge-market   { @apply text-catMarket border-catMarket; }
+
+  /* ── Terminal cursor ─────────────────────────────────────────────────────── */
+  .cursor {
+    @apply inline-block bg-phosphor animate-blink;
+    width: 0.6em;
+    height: 1em;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+
+  /* ── Card base ───────────────────────────────────────────────────────────── */
+  .card {
+    @apply bg-surface border border-border rounded transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply border-phosphorDim shadow-card-hover;
+  }
+
+  /* ── Section header ──────────────────────────────────────────────────────── */
+  .section-header {
+    @apply font-display text-sm uppercase tracking-widest mb-4;
+    letter-spacing: 0.2em;
+  }
+
+  /* ── Scanline overlay ────────────────────────────────────────────────────── */
+  /* Add this class to a fixed overlay div for the CRT scanline effect */
+  .scanlines {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+}
+
+/* ── Utility overrides ──────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Glow text effect for the masthead */
+  .text-glow-green {
+    text-shadow: 0 0 20px rgba(57, 255, 143, 0.5),
+                 0 0 40px rgba(57, 255, 143, 0.2);
+  }
+
+  .text-glow-amber {
+    text-shadow: 0 0 20px rgba(255, 179, 71, 0.5),
+                 0 0 40px rgba(255, 179, 71, 0.2);
+  }
+
+  /* Hide scrollbar but keep scroll functionality */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}

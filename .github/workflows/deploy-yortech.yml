@@ -1,0 +1,129 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# YorTech — Deployment Pipeline
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# Triggers on every push to main branch.
+# Connects to EC2 via SSH, pulls latest code, rebuilds frontend,
+# restarts the Node.js backend via PM2, and reloads Nginx.
+#
+# REQUIRED GITHUB SECRETS (Settings → Secrets → Actions):
+#   EC2_HOST        — your EC2 public IP or DNS
+#   EC2_USER        — ec2-user (Amazon Linux) or ubuntu (Ubuntu)
+#   EC2_SSH_KEY     — contents of your EC2 private key (.pem file)
+#   EC2_APP_DIR     — /home/ec2-user/yortech
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: Deploy YorTech
+
+on:
+  push:
+    branches:
+      - main
+    # Only trigger when relevant files change —
+    # pushing a README update won't redeploy the whole app
+    paths:
+      - 'server/**'
+      - 'client/**'
+      - 'nginx/**'
+      - 'portfolio/**'
+      - 'package.json'
+
+  # Allow manual trigger from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ── Step 1 — Checkout code ────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Step 2 — Set up Node.js ───────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package.json
+
+      # ── Step 3 — Install client dependencies ─────────────────────────
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      # ── Step 4 — Build React frontend ────────────────────────────────
+      # Build runs in CI, not on the EC2 server.
+      # This keeps the server lightweight and build times fast.
+      - name: Build React frontend
+        working-directory: client
+        run: npm run build
+
+      # ── Step 5 — Deploy to EC2 via SSH ───────────────────────────────
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:        ${{ secrets.EC2_HOST }}
+          username:    ${{ secrets.EC2_USER }}
+          key:         ${{ secrets.EC2_SSH_KEY }}
+          timeout:     120s
+          script: |
+            set -e  # Exit immediately if any command fails
+
+            echo "── Pulling latest code ──────────────────────────────"
+            cd ${{ secrets.EC2_APP_DIR }}
+            git pull origin main
+
+            echo "── Installing server dependencies ───────────────────"
+            cd server
+            npm ci --omit=dev
+            cd ..
+
+            echo "── Restarting Node.js server via PM2 ────────────────"
+            # 'reload' does a zero-downtime restart — no dropped requests
+            pm2 reload yortech-server || pm2 start server/index.js \
+              --name yortech-server \
+              --env production \
+              --log /home/ec2-user/logs/yortech.log \
+              --time
+
+            pm2 save
+
+            echo "── Updating Nginx config ─────────────────────────────"
+            sudo cp nginx/yorgoassal.conf /etc/nginx/conf.d/yorgoassal.conf
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+            echo "── Verifying health check ────────────────────────────"
+            sleep 3
+            curl -sf http://localhost:3001/health || echo "Warning: health check failed"
+
+            echo "── Deploy complete ───────────────────────────────────"
+
+      # ── Step 6 — Copy built frontend to EC2 ──────────────────────────
+      # The React build runs in CI (Step 4) and is copied to the server.
+      # This avoids running npm build on the small EC2 instance.
+      - name: Copy frontend build to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host:     ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          source:   "client/dist/*"
+          target:   "${{ secrets.EC2_APP_DIR }}/client/dist"
+          strip_components: 2
+
+      # ── Step 7 — Notify on failure ────────────────────────────────────
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed. Check the logs above for details."
+          echo "Common causes:"
+          echo "  - EC2 instance is stopped"
+          echo "  - SSH key secret is incorrect"
+          echo "  - npm ci failed due to package conflicts"
+          echo "  - nginx -t syntax error in config"

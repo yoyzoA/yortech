@@ -11,12 +11,12 @@ module.exports = {
   // ── Model ──────────────────────────────────────────────────────────────────
   model:           'claude-haiku-4-5-20251001',
   maxInputTokens:  5000,
-  maxOutputTokens: 3000,
+  maxOutputTokens: 4096,
 
   // ── Edition settings ───────────────────────────────────────────────────────
   edition: {
-    minArticles: 10,   // minimum articles Claude must select per edition
-    maxArticles: 15,   // maximum articles Claude may select per edition
+    minArticles: 5,   // minimum articles Claude must select per edition
+    maxArticles: 8,   // maximum articles Claude may select per edition
   },
 
   // ── Web search ─────────────────────────────────────────────────────────────
