@@ -7,7 +7,7 @@ node_modules/
 .env.local
 .env.production
 server/.env
-
+.env.example
 # ── Build outputs ─────────────────────────────────────────
 client/dist/
 client/build/
